@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tax Balance Checker</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    form {
+      max-width: 400px;
+      margin: auto;
+    }
+    input, button {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    #result {
+      margin-top: 20px;
+      font-size: 1.2em;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <h1>Tax Balance Checker</h1>
+  <form id="taxForm">
+    <label for="propertyId">Enter Property ID:</label>
+    <input type="text" id="propertyId" name="propertyId" placeholder="e.g., 371314000" required />
+    <button type="submit">Get Tax Balance</button>
+  </form>
+  <div id="result"></div>
+
+  <script>
+    document.getElementById('taxForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const propertyId = document.getElementById('propertyId').value;
+      const resultDiv = document.getElementById('result');
+
+      // Reset the result display
+      resultDiv.textContent = 'Fetching tax balance...';
+
+      try {
+        const response = await fetch('http://localhost:3000/get-tax-balance', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ propertyId }),
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          resultDiv.textContent = `Tax Balance for Property ID ${propertyId}: ${data.balance}`;
+        } else {
+          resultDiv.textContent = `Error: ${data.error}`;
+        }
+      } catch (error) {
+        resultDiv.textContent = 'Failed to fetch tax balance. Please try again later.';
+        console.error('Error:', error);
+      }
+    });
+  </script>
+</body>
+</html>
